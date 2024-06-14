@@ -1,0 +1,168 @@
+import React, { useEffect, useState } from "react";
+import Layout from "../components/Layout";
+import BannarSlider from "../components/BannarSlider";
+import HomeSlider from "../components/HomeSilder";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios'
+import {toast,ToastContainer} from 'react-toastify'
+
+function Home() {
+  const navigate = useNavigate();
+
+  
+  const [itemsData,setitemsData]=useState([{}
+  
+  ])
+
+  useEffect(()=>{
+    let fetchData=async()=>{
+      let data=await axios.get("http://localhost:9000/getproducts")
+      console.log("data",data)
+  setitemsData(data.data)
+
+    }
+    fetchData()
+    console.log("fetch data",itemsData)
+  },[])
+
+
+  const addToCart = async (productId) => {
+   
+    try {
+// Cartrouter.post('/add-to-cart', cartController.addToCart);
+if(localStorage.getItem("token")!=null){
+const response = await axios.post("http://localhost:9000/add-to-cart", {
+        productId: productId,
+        userId:localStorage.getItem("userId")
+        
+      });
+       toast.success(response.data.message)
+    }
+    else{
+         
+      navigate("/login");
+        console.log("login call")
+       
+    }
+      // You can handle the response or any other action after adding to cart
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+    }
+  };
+  
+  return (
+    <Layout>
+      <div className="w-full justify-center ">
+        <div className="w-full  h-14 bg-[#88C8BC] flex justify-center items-center">
+        <div className="w-full flex justify-center">
+          <div className=" w-[95%] md:w-[40%] h-14 bg-[#88C8BC]">
+            <BannarSlider />
+          </div>
+          </div>
+        </div>
+        <div className="w-full flex justify-center">
+        <div className="w-[95%] ">          <HomeSlider />
+       
+        </div>
+        </div>
+
+        <div className="w-full flex justify-center">
+          <div className="w-[65%] h-[250px] flex justify-center items-center">
+            <p className="text-[20px] md:text-[30px] lg:text-[44px] font-bold">
+              Best quality of shoes with new design
+            </p>
+          </div>
+        </div>
+
+        <div className="w-full flex justify-between px-5">
+          <div className="w-[49%]">
+            <Link to="/Men">
+              <img src="/public/Home/img_bg_1.jpg" alt=" " />
+              <p className="text-center mt-4 text-[20px] md:text-[24px] lg:text-4xl ">
+                Shop Men's Collection
+              </p>
+            </Link>
+          </div>
+          <div className="w-[49%]">
+            <Link to="/Women">
+              <img src="/public/Home/women.jpg" alt=" " />
+              <p className="text-center mt-4  text-[20px] md:text-[24px] lg:text-4xl">
+                Shop Women's Collection
+              </p>
+            </Link>
+          </div>
+        </div>
+
+        <div className="w-full flex justify-center">
+          <div className="w-[65%] h-[200px] lg:h-[350px] flex justify-center items-center">
+            <p className=" text-[20px] md:text-[24px] lg:text-[44px] font-bold">
+            BEST SELLERS
+            </p>
+          </div>
+        </div>
+       
+        <div className="w-full flex justify-center">
+      <div className="w-[70%] flex justify-center items-center flex-wrap gap-4">
+      {itemsData.map((item) => (
+        <Link
+               to={`/ProductDetails/${item._id}`}
+                key={item._id}
+                className="flex flex-col border mt-4 w-full sm:w-[220px]  lg:w-[220px] justify-center items-center"
+              >
+          <img src={item.imageUrl} alt="" className="object-cover" />
+          <p className="text-center px-2 py-2">{item.name}</p>
+          <p className="py-3">{ " £" +item.price}</p>
+          <Link
+            className="px-2 py-1 bg-[#d9f4f0] hover:bg-[#88C8BC]"
+            onClick={() => addToCart(item._id)}
+          >
+            Add To Cart
+          </Link>
+        </Link>
+      ))}
+          </div>
+        </div>
+
+
+    <div className="w-full flex justify-center">
+          <div className="w-[65%] h-[200px] flex justify-center items-center">
+           <button className="px-6 py-4 bg-[#d9f4f0] text-xs rounded-full text-black font-medium hover:bg-[#88C8BC]">Shop All Products</button>
+          </div>
+        </div>
+
+        
+    <div className="w-full flex justify-center">
+          <div className="w-[65%] lg:h-[200px] flex justify-center items-center">
+          <p className="text-base text-gray-400 font-bold">TRUSTED PARTNERS</p>
+          </div>
+        </div>
+
+
+
+        <div className="w-full flex justify-center lg:mt-[200px]">
+        <div className="w-[70%] h-[100px] md:h-[250px] flex justify-between flex-wrap">
+          <div className="w-[60px] md:w-[150px]">
+            <img src="public/Home/brand-1.jpg" alt="Brand 1" />
+          </div>
+          <div className="w-[60px] md:w-[150px]">
+            <img src="public/Home/brand-2.jpg" alt="Brand 2" />
+          </div>
+          <div className="w-[60px] md:w-[150px]">
+            <img src="public/Home/brand-3.jpg" alt="Brand 3" />
+          </div>
+          <div className="w-[60px] md:w-[150px]">
+            <img src="public/Home/brand-4.jpg" alt="Brand 4" />
+          </div>
+          <div className="w-[60px] md:w-[150px]">
+            <img src="public/Home/brand-5.jpg" alt="Brand 5" />
+          </div>
+        </div>
+      </div>
+      <ToastContainer/>
+    
+      </div>
+    </Layout>
+  );
+}
+
+export default Home;
